@@ -4,6 +4,10 @@ const { v4: uuidv4 } = require("uuid");
 
 const contactsPath = path.resolve("db/contacts.json");
 
+const updateContacts = async (contacts) => {
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, "\t"));
+};
+
 const listContacts = async () => {
   try {
     const data = await fs.readFile(contactsPath, "utf8");
@@ -33,6 +37,7 @@ const removeContact = async (contactId) => {
     return null;
   }
   const [remove] = data.splice(res, 1);
+  await updateContacts(data);
   return remove;
 };
 
@@ -45,10 +50,9 @@ const addContact = async (name, email, phone) => {
     phone,
   };
   data.push(contact);
+  await updateContacts(data);
   return contact;
 };
-
-addContact(process.argv[2], process.argv[3], process.argv[4]);
 
 module.exports = {
   listContacts,
